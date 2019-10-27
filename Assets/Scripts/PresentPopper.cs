@@ -10,6 +10,8 @@ public class PresentPopper : MonoBehaviour
 	public Image PresentTextPanel;
 	public TextMeshProUGUI PresentText;
 
+	static bool PresentPopAnimationLock = false;
+
 	void Start()
     {
 		if (ParticleSystem == null)
@@ -20,6 +22,11 @@ public class PresentPopper : MonoBehaviour
 
     void Update()
     {
+	    if (PresentPopAnimationLock)
+	    {
+			return;
+	    }
+
 	    if (Input.GetMouseButtonUp(0))
 	    {
 		    TryPoppingPresentFromScreenPosition(Input.mousePosition);
@@ -47,6 +54,17 @@ public class PresentPopper : MonoBehaviour
 
 	IEnumerator PopPresent(Present present)
 	{
+		PresentPopAnimationLock = true;
+		var particleSystemPosition = present.transform.position;
+		ParticleSystem.transform.position = particleSystemPosition;
+
+		ParticleSystem.Play();
+
+		while (ParticleSystem.isPlaying)
+		{
+			yield return null;
+		}
+
 		PresentTextPanel.transform.localScale = Vector2.zero;
 		PresentTextPanel.gameObject.SetActive(true);
 		PresentText.text = present.PresentText;
@@ -66,5 +84,6 @@ public class PresentPopper : MonoBehaviour
 	public void DismissPresent()
 	{
 		PresentTextPanel.gameObject.SetActive(false);
+		PresentPopAnimationLock = false;
 	}
 }

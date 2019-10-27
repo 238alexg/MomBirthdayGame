@@ -12,9 +12,16 @@ public class CameraBackgroundColorRevolver : MonoBehaviour
 
 	const float SecondsPerColorUpdate = 0.02f;
 
+	ParticleSystem ParticleSystem;
+	ParticleSystem.MinMaxGradient MinMaxGradient;
+	ParticleSystem.MainModule MainModule;
+
     void Start()
     {
 		Camera = gameObject.GetComponent<Camera>();
+	    ParticleSystem = FindObjectOfType<ParticleSystem>();
+	    MainModule = ParticleSystem.main;
+
     }
 
 	void Update()
@@ -25,6 +32,18 @@ public class CameraBackgroundColorRevolver : MonoBehaviour
 		{
 			UpdateNextCameraColor();
 			SecondsSinceColorUpdate = 0;
+
+			var oppositeColorOfBackground = new Color(1 - CurrentColor.r, 1 - CurrentColor.g, 1 - CurrentColor.b, 1);
+
+			var minColor = oppositeColorOfBackground * 0.8f;
+			minColor.a = 1;
+			var maxColor = oppositeColorOfBackground * 1.3f;
+			maxColor.a = 1;
+
+			MinMaxGradient.colorMin = minColor;
+			MinMaxGradient.colorMax = maxColor;
+
+			MainModule.startColor = MinMaxGradient;
 		}
 	}
 
